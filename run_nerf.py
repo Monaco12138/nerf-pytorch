@@ -178,6 +178,8 @@ def render_path(render_poses, hwf, K, chunk, render_kwargs, gt_imgs=None, savedi
 def create_nerf(args):
     """Instantiate NeRF's MLP model.
     """
+    # multires: 10
+    # i_embed = 0
     embed_fn, input_ch = get_embedder(args.multires, args.i_embed)
 
     input_ch_views = 0
@@ -186,6 +188,8 @@ def create_nerf(args):
         embeddirs_fn, input_ch_views = get_embedder(args.multires_views, args.i_embed)
     output_ch = 5 if args.N_importance > 0 else 4
     skips = [4]
+
+    # D = 8, W = 256, input_ch = 63, output_ch = 5, skips = [4], input_ch_views = 63, 
     model = NeRF(D=args.netdepth, W=args.netwidth,
                  input_ch=input_ch, output_ch=output_ch, skips=skips,
                  input_ch_views=input_ch_views, use_viewdirs=args.use_viewdirs).to(device)
@@ -575,7 +579,7 @@ def train():
         far = 6.
 
         if args.white_bkgd:
-            images = images[...,:3]*images[...,-1:] + (1.-images[...,-1:])
+            images = images[...,:3] * images[...,-1:] + (1. - images[...,-1:])
         else:
             images = images[...,:3]
 
